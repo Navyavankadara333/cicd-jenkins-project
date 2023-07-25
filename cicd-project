@@ -28,4 +28,127 @@ sudo apt-get update
 sudo apt-get install jenkins
 Meanwhile goto your instance and scroll down go to security and goto security groups and from there goto edit inbound rules and goto add rules
 and add type custom tcp , port 8080 and network range 0.0.0.0/0 and save rules.
-
+Now check whether jenkins is installed or not
+--->systemctl status jenkins
+Copy the secret key
+Now goto jenkins instance and copy the public IP and in new tab type IP address:8080 , now you will see the jenkins login page use the copied secret key as password 
+and login to the jenkins.
+If you have forgotten to copy the secret key use these command
+--->cat /var/lib/jenkins/secrets/initialAdminPaawsord(you will find this path in login page)
+Login and start jenkins
+Create a pipeline
+Now in source code management give your github url from where you can find your application templates
+enable git triggering option
+now goto git and go to settings from there find webhooks and add webhooks
+Now build a pipeline
+Now u cann add any changes to your repository like add any file you can see that changes reflects in your jenkins .
+Again build it.
+Now copy IP address of a sonarqube instance and goto your terminal open a new termial and 
+--->ssh -i ultimate-cicd-demo.pem ubuntu@34.207.94.139
+--->sudo hostnamectl set-hostname sonarqube
+Now go to jenkins terminal and execute
+--->sudo hostnamectl set-hostname jenkins
+--->/bin/bash
+Now in sonarqube terminal
+--->sudo apt update
+--->sudo apt install openjdk-17-jre
+--->wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip
+--->ls
+--->sudo apt install unzip
+--->unzip sonarqube-9.9.0.65466.zip
+--->ls
+--->cd sonarqube-9.9.0.65466
+--->ls
+--->cd bin
+--->ls
+--->cd linux-x86-64
+--->ls
+--->./sonar.sh
+--->./sonar.sh console
+Now again add the inbound security rule 9000 port for sonarqube.
+Now copy sonarqube ip address and port 9000 and goto new tab and open sonarqube both username and password is admin.
+-->now chose jenkin->github->continue-other->copy two things
+copy project key and go to myaccount->security and jenerate a token(global analysis token)
+-->And copy the token
+Goto jenkins and install sonarqubescanner and SSH2 Easy plugins.
+globaltool configuration->sonarqubescanner->add->save
+configure system->sonarqube severs->add->save
+pipeline->add buildstep->execute sonarqube scanner->save
+manage jenkins->sonarqube token->server authentication token->add>jenkins->save
+build pipeline
+Now goto sonrqube you can see the sucess result
+Now copy docker instance ip and 
+--->ssh -i ultimate-cicd-demo.pem ubuntu@3.93.76.96
+--->sudo hostnamectl set-hostname docker
+--->/bin/bash
+--->sudo apt update
+--->sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+--->sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+--->echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+--->sudo apt-get update
+--->sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+goto jenkins terminal
+--->sudo su jenkins
+--->ssh ubuntu@3.93.76.96
+go to docker
+--->sudo su
+--->nano /etc/ssh/
+--->nano /etc/ssh/sshd_config
+uncomment pubkeyauthentication yes
+PasswordAuthentication to Yes
+--->systemctl restart sshd
+--->passwd ubuntu
+--->exit
+--->ssh-keygen
+--->ssh-copy-id ubuntu@3.93.76.96
+--->exit
+goto jenkins
+manage jenkins->servergroup center->add->save
+configure system->servergrouplist->add->save
+configure->remoteshell->add touch test.txt file->save
+build it
+come to docker terminal 
+--->ls
+goto repository add new file dockerfile
+--->FROM nginx
+copy ./usr/share/nginx/html
+save
+build again
+goto docker 
+--->exit
+--->ls
+--->mkdir website
+--->pwd
+remove remote shell and give execute shell
+scp ./* ubuntu@3.93.76.96:~/website/
+save and apply
+build now , now we will get an error because we added a docker file so now verify it again
+so now
+scp -r ./* ubuntu@3.93.76.96:~/website/
+build now
+now its a success
+goto docker
+--->ls
+configure->add execute remote shell->cd/home/ubuntu/website/ and save
+goto docker 
+--->ps(permission denied)
+--->sudo usermod -aG docker ubuntu
+--->newgrp docker
+--->docker ps
+goto configure in that execute remote shell type
+-->cd/home/ubuntu/website
+docker build -t my website
+docker run -d -p 8085:80 --name=Onix-website mywebsite
+save and build again
+goto docker terminal
+--->docker ps
+goto docker instance->security groups->edit inbound rules->allow port 8085.
+Now copy docker public IP and type in new tab like this
+-->3.93.76.96:8085
+---------------->you can see your respective website
