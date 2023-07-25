@@ -1,0 +1,31 @@
+STEPS:
+Firstly download any kind of application templates.(here we used css template).
+Download the zip file and extract the files and now create a new repository in github and push all the extracted files into the new repository.
+Now go to ec2 and create 3 instances for jenkins,sonarqube and docker.
+System Requirements:
+-->UBUNTU OS
+-->t2.medium(instance type) 
+Download the keypair and save it .
+now copy the public IP address of first instance jenkins and now open your terminal and change your path to downloads
+--->cd downloads
+--->ssh -i (keypair filename.pem) os@ipaddress
+--->ssh -i ultimate-cicd-demo.pem ubuntu@18.234.140.112
+if permission denied use this command
+--->chmod 400 ultimate-cicd-demo.pem
+Now again run the above command i.e.ssh -i ultimate-cicd-demo.pem ubuntu@18.234.140.112
+Now you will go into the virtual machine.
+--->sudo apt update
+Now install java runtime environment
+sudo apt install openjdk-11-jre
+Now follow the link for installing jenkins
+->https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+--->curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins
+Meanwhile goto your instance and scroll down go to security and goto security groups and from there goto edit inbound rules and goto add rules
+and add type custom tcp , port 8080 and network range 0.0.0.0/0 and save rules.
+
